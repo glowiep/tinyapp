@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/glowiep/tinyapp/issues"
   },
-  "homepage": "https://github.com/glowiep/tinyapp#readme"
+  "homepage": "https://github.com/glowiep/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
