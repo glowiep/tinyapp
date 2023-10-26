@@ -39,10 +39,20 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+})
+
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
-  urlDatabase[randomString] = req.body.longURL;
-  console.log(urlDatabase)
+  const longURL = req.body.longURL;
+  if (!(longURL.includes("https://") || longURL.includes("http://"))) {
+    urlDatabase[randomString] = `https://${longURL}`
+  } else {
+    urlDatabase[randomString] = longURL;
+  }
+  console.log(urlDatabase) // test
   res.redirect(`/urls/${randomString}`);
 });
 
