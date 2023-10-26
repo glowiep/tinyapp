@@ -40,9 +40,11 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
-})
+  const randomString = generateRandomString();
+  urlDatabase[randomString] = req.body.longURL;
+  console.log(urlDatabase)
+  res.redirect(`/urls/${randomString}`);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
