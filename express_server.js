@@ -46,18 +46,18 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
-})
+});
 
 // POST handler to generate short URL id when longURL is submitted
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   const longURL = req.body.longURL;
   if (!(longURL.includes("https://") || longURL.includes("http://"))) {
-    urlDatabase[randomString] = `https://${longURL}`
+    urlDatabase[randomString] = `https://${longURL}`;
   } else {
     urlDatabase[randomString] = longURL;
   }
-  console.log(urlDatabase) // test
+  console.log(urlDatabase); // test
   res.redirect(`/urls/${randomString}`);
 });
 
@@ -65,7 +65,13 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
-})
+});
+
+// POST handler to update existing URL
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.UpdatedLongURL;
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
