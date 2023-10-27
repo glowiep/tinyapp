@@ -125,9 +125,14 @@ app.post("/logout", (req, res) => {
 
 // POST handler to handle registration form data
 app.post("/register", (req, res) => {
-
   const id = generateRandomString();   // unique user id
   const { email, password } = req.body;
+
+  // Check if email or password are empty strings
+  if (email === "" || password === "") {
+     res.status(400).send("The Email and Password field must not be empty.")
+  }
+
   users[id] = {
     id,
     email,
