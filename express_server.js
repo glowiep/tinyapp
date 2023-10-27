@@ -56,6 +56,14 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+// Register page
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render("urls_registration", templateVars)
+});
+
 // POST handler to generate short URL id when longURL is submitted
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
