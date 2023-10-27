@@ -17,7 +17,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <div class="ml-auto">
+      <div class="ml-auto" style="display: flex; justify-content: flex-end">
         <% if (username) { %>
           <form method="POST" action="/logout" class="form-inline">
           <a class="navbar-brand"><%= `Logged in as: ${username}!`  %></a>
@@ -30,9 +30,9 @@
         name="username"
         type="text"
         placeholder="Username"
-        style="margin: 1em"
         />
-        <button type="submit" class="btn btn-outline-dark">Login</button>
+        <button type="submit" class="btn btn-outline-dark" style="margin: 1em">Login</button>
+        <a href="/register" class="btn btn-outline-dark" role="button">Register</a>
       </form>
       <% } %>
       </div>
