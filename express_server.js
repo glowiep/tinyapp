@@ -7,6 +7,9 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
+// Import helper functions
+const { generateRandomString } = require("./helperFunctions");
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -122,6 +125,7 @@ app.post("/logout", (req, res) => {
 
 // POST handler to handle registration form data
 app.post("/register", (req, res) => {
+
   const id = generateRandomString();   // unique user id
   const { email, password } = req.body;
   users[id] = {
@@ -136,13 +140,3 @@ app.post("/register", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-// Returns a string of 6 random alphanumeric characters
-function generateRandomString() {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let count = 0; count < 6; count++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-}
