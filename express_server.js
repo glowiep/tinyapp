@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser"); // Express middleware that facilitates working with cookies
 const app = express();
 const PORT = 8080; // default port 8080
 
