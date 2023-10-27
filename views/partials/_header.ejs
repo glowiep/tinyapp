@@ -20,8 +20,8 @@
       <div class="ml-auto" style="display: flex; justify-content: flex-end">
         <% if (username) { %>
           <form method="POST" action="/logout" class="form-inline">
-          <a class="navbar-brand"><%= `Logged in as: ${username}!`  %></a>
-          <button type="submit" class="btn btn-outline-dark">Logout</button>
+          <a class="navbar-brand"><%= `Logged in as: ${username}!` %></a>
+          <button type="submit" class="btn btn-outline-dark" style="margin: 1em">Logout</button>
           </form>
           <% } else { %>
       <form method="POST" action="/login" class="form-inline">
