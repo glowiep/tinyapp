@@ -118,14 +118,14 @@ app.post("/logout", (req, res) => {
 
 // POST handler to handle registration form data
 app.post("/register", (req, res) => {
-  // unique user id
-  const id = generateRandomString();
+  const id = generateRandomString();   // unique user id
   const { email, password } = req.body;
   users[id] = {
     id,
     email,
     password
   };
+  res.cookie("user_id", id);          // set a user_id cookie containing the user's newly generated ID
   res.redirect("/urls");
 });
 
