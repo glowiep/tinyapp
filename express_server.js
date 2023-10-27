@@ -41,7 +41,8 @@ app.get("/hello", (req, res) => {
 // My URLs landing page
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    users,
+    user_id: req.cookies["user_id"],
     urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
@@ -49,7 +50,8 @@ app.get("/urls", (req, res) => {
 // Create TinyURL page
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    users,
+    user_id: req.cookies["user_id"]
   };
   res.render("urls_new", templateVars);
 });
@@ -57,9 +59,10 @@ app.get("/urls/new", (req, res) => {
 // TinyURL info page
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
+    users,
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
+    user_id: req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
 });
@@ -73,7 +76,8 @@ app.get("/u/:id", (req, res) => {
 // Register page
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    users,
+    user_id: req.cookies["user_id"]
   };
   res.render("urls_registration", templateVars);
 });
@@ -106,13 +110,13 @@ app.post("/urls/:id", (req, res) => {
 // POST to login page
 app.post("/login", (req, res) => {
   const { username } = req.body;
-  res.cookie('username', username);
+  res.cookie("username", username);
   res.redirect("/urls");
 });
 
 // Logout Endpoint that clears username cookie and redirects user back to /urls page
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
