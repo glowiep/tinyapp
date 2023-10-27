@@ -116,6 +116,19 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// POST handler to handle registration form data
+app.post("/register", (req, res) => {
+  // unique user id
+  const id = generateRandomString();
+  const { email, password } = req.body;
+  users[id] = {
+    id,
+    email,
+    password
+  };
+  res.redirect("/urls");
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
