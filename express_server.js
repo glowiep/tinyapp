@@ -12,6 +12,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// To store and access users
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -26,7 +40,7 @@ app.get("/hello", (req, res) => {
 
 // My URLs landing page
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase};
   res.render("urls_index", templateVars);
@@ -60,8 +74,8 @@ app.get("/u/:id", (req, res) => {
 app.get("/register", (req, res) => {
   const templateVars = {
     username: req.cookies["username"]
-  }
-  res.render("urls_registration", templateVars)
+  };
+  res.render("urls_registration", templateVars);
 });
 
 // POST handler to generate short URL id when longURL is submitted
@@ -92,15 +106,15 @@ app.post("/urls/:id", (req, res) => {
 // POST to login page
 app.post("/login", (req, res) => {
   const { username } = req.body;
-  res.cookie('username', username)
-  res.redirect("/urls")
-})
+  res.cookie('username', username);
+  res.redirect("/urls");
+});
 
 // Logout Endpoint that clears username cookie and redirects user back to /urls page
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
