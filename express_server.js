@@ -121,16 +121,14 @@ app.post("/urls/:id", (req, res) => {
 
 // POST to login page
 app.post("/login", (req, res) => {
-  // const { username } = req.body;
-  // res.cookie("username", username);
   const { email, password } = req.body;
   const user = getUserByEmail(email, users);
-  if (user !== null && user.password === password) {
+  if (user !== null && user.password === password) {  // successful login
     res.cookie("user_id", user.id);
     res.redirect("/urls");
-  } else if (user !== null && user.password !== password) {
+  } else if (user !== null && user.password !== password) { // email is found but password does not match
     res.status(403).send("The password is incorrect.");
-  } else if (user === null) {
+  } else if (user === null) { // email is not found
     res.status(403).send("The user with this email address is not found.");
   }
 });
@@ -138,7 +136,7 @@ app.post("/login", (req, res) => {
 // Logout Endpoint that clears username cookie and redirects user back to /urls page
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // POST handler to handle registration form data
