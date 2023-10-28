@@ -19,13 +19,15 @@
       </div>
       <div class="ml-auto" style="display: flex; justify-content: flex-end">
         <% if (users[user_id]) { %>
-          <form method="POST" action="/logout" class="form-inline">
-          <a class="navbar-brand"><%= `Logged in as: ${users[user_id].email}!` %></a>
-          <button type="submit" class="btn btn-outline-dark" style="margin: 1em">Logout</button>
-          </form>
+            <form method="POST" action="/logout" class="form-inline">
+            <a class="navbar-brand"><%= `Logged in as: ${users[user_id].email}!` %></a>
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+            </form>
           <% } else { %>
-          <a href="/login" class="btn btn-outline-dark" role="button" style="margin: 1em">Login</a>
-          <a href="/register" class="btn btn-outline-dark" role="button" style="margin: 1em">Register</a>
+            <div class="navbar-nav">
+              <a class="nav-item nav-link" href="/login">Login</a>
+              <a class="nav-item nav-link" href="/register">Register</a>
+            </div>
           <% } %>
       </div>
     </div>
