@@ -121,9 +121,18 @@ app.post("/urls/:id", (req, res) => {
 
 // POST to login page
 app.post("/login", (req, res) => {
-  const { username } = req.body;
-  res.cookie("username", username);
-  res.redirect("/urls");
+  // const { username } = req.body;
+  // res.cookie("username", username);
+  const { email, password } = req.body;
+  const user = getUserByEmail(email, users);
+  if (user !== null && user.password === password) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else if (user !== null && user.password !== password) {
+    res.status(403).send("The password is incorrect.");
+  } else if (user === null) {
+    res.status(403).send("The user with this email address is not found.");
+  }
 });
 
 // Logout Endpoint that clears username cookie and redirects user back to /urls page
