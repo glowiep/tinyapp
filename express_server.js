@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
 // Import helper functions
-const { generateRandomString } = require("./helperFunctions");
+const { generateRandomString, getUserByEmail } = require("./helperFunctions");
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -130,7 +130,12 @@ app.post("/register", (req, res) => {
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
-     res.status(400).send("The Email and Password field must not be empty.")
+    return  res.status(400).send("The Email and Password field must not be empty.");
+  }
+
+  // Check if email already exists
+  if (getUserByEmail(email, users) !== null) {
+    return res.status(400).send("An account with this email already exists.");
   }
 
   users[id] = {
