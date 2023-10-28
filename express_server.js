@@ -133,7 +133,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-// Logout Endpoint that clears username cookie and redirects user back to /urls page
+// Logout Endpoint that clears username cookie and redirects user back to /login page
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/login");
