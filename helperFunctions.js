@@ -12,7 +12,6 @@ const generateRandomString = function() {
 const getUserByEmail = function(email, userDatabase) {
   for (let user in userDatabase) {
     if (userDatabase[user].email === email) {
-      console.log(userDatabase[user].id, email);
       return userDatabase[user];
     }
   }
