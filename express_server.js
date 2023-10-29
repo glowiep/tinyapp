@@ -103,7 +103,6 @@ app.post("/urls", (req, res) => {
   } else {
     urlDatabase[randomString] = longURL;
   }
-  console.log(urlDatabase); // test
   res.redirect(`/urls/${randomString}`);
 });
 
@@ -159,7 +158,7 @@ app.post("/register", (req, res) => {
     email,
     password
   };
-  res.cookie("user_id", id);          // set a user_id cookie containing the user's newly generated ID
+  res.cookie("user_id", id);  // set a user_id cookie containing the user's newly generated ID
   res.redirect("/urls");
 });
 
