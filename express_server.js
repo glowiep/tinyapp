@@ -11,8 +11,14 @@ app.use(cookieParser());
 const { generateRandomString, getUserByEmail } = require("./helperFunctions");
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // To store and access users
@@ -70,7 +76,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     users,
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
@@ -79,7 +85,7 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to longURL
 app.get("/u/:id", (req, res) => {
   if (users[req.params.id]) {
-    const longURL = urlDatabase[req.params.id];
+    const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   } else {
     res.send("The Short URL ID does not exist.\n");
@@ -137,7 +143,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // POST handler to update existing URL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.UpdatedLongURL;
+  urlDatabase[req.params.id].longURL = req.body.UpdatedLongURL;
   res.redirect("/urls");
 });
 
