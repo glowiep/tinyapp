@@ -82,7 +82,12 @@ app.get("/register", (req, res) => {
     users,
     user_id: req.cookies["user_id"]
   };
-  res.render("urls_registration", templateVars);
+
+  if (users[req.cookies["user_id"]]) {
+    res.redirect("/urls");  // Redirect logged in users to /urls page
+  } else {
+    res.render("urls_registration", templateVars);
+  }
 });
 
 // Login page
@@ -91,7 +96,12 @@ app.get("/login", (req, res) => {
     users,
     user_id: req.cookies["user_id"]
   };
-  res.render("urls_login", templateVars);
+  
+  if (users[req.cookies["user_id"]]) {
+    res.redirect("/urls")  // Redirect logged in users to /urls page
+  } else {
+    res.render("urls_login", templateVars);
+  }
 });
 
 // POST handler to generate short URL id when longURL is submitted
