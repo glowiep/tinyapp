@@ -78,8 +78,12 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect to longURL
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  if (users[req.params.id]) {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+  } else {
+    res.send("The Short URL ID does not exist.\n");
+  }
 });
 
 // Register page
@@ -116,7 +120,7 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
 
   if (!users[req.cookies["user_id"]]) {
-    res.send("Please log in to generate shortened URLs\n");
+    res.send("Please log in to generate shortened URLs.\n");
   } else if (!(longURL.includes("https://") || longURL.includes("http://"))) {
     urlDatabase[randomString] = `https://${longURL}`;
   } else {
