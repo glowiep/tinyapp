@@ -52,8 +52,14 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     users,
     user_id: req.cookies["user_id"],
-    urls: urlDatabase};
-  res.render("urls_index", templateVars);
+    urls: urlDatabase
+  };
+
+  if (users[req.cookies["user_id"]]) {
+    res.render("urls_index", templateVars);
+  } else {
+    res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.");
+  }
 });
 
 // Create TinyURL page
