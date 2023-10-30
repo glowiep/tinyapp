@@ -56,7 +56,13 @@ app.get("/urls/new", (req, res) => {
     users,
     user_id: req.cookies["user_id"]
   };
-  res.render("urls_new", templateVars);
+
+  if (users[req.cookies["user_id"]]) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login"); // If not logged in, user will be redirected to /login page
+  }
+  
 });
 
 // TinyURL info page
