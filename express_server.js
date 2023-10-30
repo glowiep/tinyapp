@@ -104,7 +104,7 @@ app.get("/login", (req, res) => {
   };
   
   if (users[req.cookies["user_id"]]) {
-    res.redirect("/urls")  // Redirect logged in users to /urls page
+    res.redirect("/urls");  // Redirect logged in users to /urls page
   } else {
     res.render("urls_login", templateVars);
   }
@@ -114,7 +114,10 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   const longURL = req.body.longURL;
-  if (!(longURL.includes("https://") || longURL.includes("http://"))) {
+
+  if (!users[req.cookies["user_id"]]) {
+    res.send("Please log in to generate shortened URLs\n");
+  } else if (!(longURL.includes("https://") || longURL.includes("http://"))) {
     urlDatabase[randomString] = `https://${longURL}`;
   } else {
     urlDatabase[randomString] = longURL;
