@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
 // Import helper functions
-const { generateRandomString, getUserByEmail, urlsForUser } = require("./helperFunctions");
+const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId } = require("./helperFunctions");
 
 const urlDatabase = {   // The urlDatabase contain multiple 'urlID' objects, which contains the long url and the userID (cookie)
   b6UTxQ: {
@@ -59,7 +59,7 @@ app.get("/urls", (req, res) => {
   if (users[req.cookies["user_id"]]) {
     res.render("urls_index", templateVars);
   }
-  res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.");
+  res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.\n");
 });
 
 // Create TinyURL page
@@ -84,15 +84,14 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"]
   };
-  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
 
-  if (users[req.cookies["user_id"]] && Object.keys(userURLs).includes(req.params.id)) {
+  if (users[req.cookies["user_id"]] && checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
     res.render("urls_show", templateVars);
   } else if (users[req.cookies["user_id"]] === undefined) {
-    res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.");
+    res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.\n");
   }
   // When a logged in user tries to access the TinyURL info page which belongs to another user.
-  res.send("You do not own this URL.");
+  res.status(403).send("Unauthorized request. You do not own this TinyURL.");
 });
 
 // Redirect to longURL. User does not need to be logged in.
@@ -101,7 +100,7 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
-  res.send("The Short URL ID does not exist.\n");
+  res.status(404).send("The Short URL ID does not exist.\n");
 });
 
 // Register page
@@ -136,7 +135,7 @@ app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   const longURL = req.body.longURL;
   if (!users[req.cookies["user_id"]]) {
-    res.send("Please log in to generate shortened URLs.\n");
+    res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to generate shortened URLs.\n");
   } else if (!(longURL.includes("https://") || longURL.includes("http://"))) {
     urlDatabase[randomString] = { longURL: `https://${longURL}`, userID: req.cookies["user_id"]};
   } else {
@@ -147,8 +146,12 @@ app.post("/urls", (req, res) => {
 
 // POST handler for the delete function
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
+  // check if the user has permission to delete the urlID
+  if (checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
+    res.redirect("/urls");
+    delete urlDatabase[req.params.id];
+  }
+  res.status(401).send("Unauthorized request. Please <a href='http://localhost:8080/login'>log in</a> to delete your URL.\n");
 });
 
 // POST handler to update existing URL
@@ -165,9 +168,9 @@ app.post("/login", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else if (user !== null && user.password !== password) { // email is found but password does not match
-    res.status(403).send("The password is incorrect. Please <a href='http://localhost:8080/login'>try again</a>.");
+    res.status(400).send("The password is incorrect. Please <a href='http://localhost:8080/login'>try again</a>.\n");
   } else if (user === null) { // email is not found
-    res.status(403).send("The user with this email address is not found.");
+    res.status(404).send("The user with this email address is not found.\n");
   }
 });
 
@@ -184,12 +187,12 @@ app.post("/register", (req, res) => {
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
-    return  res.status(400).send("The Email and Password field must not be empty.");
+    return  res.status(400).send("The Email and Password field must not be empty.\n");
   }
 
   // Check if email already exists
   if (getUserByEmail(email, users) !== null) {
-    return res.status(400).send("An account with this email already exists.");
+    return res.status(400).send("An account with this email already exists.\n");
   }
 
   users[id] = {
