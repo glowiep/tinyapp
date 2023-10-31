@@ -72,7 +72,8 @@ app.get("/urls/new", (req, res) => {
   if (users[req.cookies["user_id"]]) {
     res.render("urls_new", templateVars);
   }
-  res.redirect("/login"); // If not logged in, user will be redirected to /login page
+  // If not logged in, user will be redirected to /login page
+  res.redirect("/login");
 });
 
 // TinyURL info page
@@ -83,11 +84,15 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"]
   };
+  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
 
-  if (users[req.cookies["user_id"]]) {
+  if (users[req.cookies["user_id"]] && Object.keys(userURLs).includes(req.params.id)) {
     res.render("urls_show", templateVars);
+  } else if (users[req.cookies["user_id"]] === undefined) {
+    res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.");
   }
-  res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.");
+  // When a logged in user tries to access the TinyURL info page which belongs to another user.
+  res.send("You do not own this URL.");
 });
 
 // Redirect to longURL. User does not need to be logged in.
