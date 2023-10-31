@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
 // Import helper functions
-const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId } = require("./helperFunctions");
+const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require("./helperFunctions");
 
 const urlDatabase = {   // The urlDatabase contain multiple 'urlID' objects, which contains the long url and the userID (cookie)
   b6UTxQ: {
@@ -150,8 +150,14 @@ app.post("/urls/:id/delete", (req, res) => {
   if (checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
     res.redirect("/urls");
     delete urlDatabase[req.params.id];
+  } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+    // Case when user is logged in, user does not own the url, and the urlID exists in the database
+    res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+  } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+    // Case when urlID does not exists in the entire database
+    res.status(404).send("Unable to perform delete request as this TinyURL does not exist\n");
   }
-  res.status(401).send("Unauthorized request. Please <a href='http://localhost:8080/login'>log in</a> to delete your URL.\n");
+  res.status(401).send("Unauthorized request. Please <a href='http://localhost:8080/login'>log in</a> to delete your TinyURL.\n");  // user is not logged in
 });
 
 // POST handler to update existing URL
