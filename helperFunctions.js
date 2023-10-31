@@ -29,4 +29,13 @@ const urlsForUser = function(id, urlDatabase) {
   return urls;
 };
 
-module.exports = { generateRandomString, getUserByEmail, urlsForUser };
+// Returns true if the urlID exists for the userID specified
+const checkUrlId = function(urlID, userID, urlDatabase) {
+  const userDatabase = urlsForUser(userID, urlDatabase);  // the copy of database for the specified userID
+  if (Object.keys(userDatabase).includes(urlID)) {
+    return true;
+  }
+  return false;
+};
+
+module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId };
