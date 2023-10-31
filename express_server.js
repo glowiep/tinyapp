@@ -55,11 +55,11 @@ app.get("/urls", (req, res) => {
     // filter list in urlDatabase to show only the user's URLs
     urls: urlsForUser(req.cookies["user_id"], urlDatabase)
   };
+
   if (users[req.cookies["user_id"]]) {
     res.render("urls_index", templateVars);
-  } else {
-    res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.");
   }
+  res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.");
 });
 
 // Create TinyURL page
@@ -71,10 +71,8 @@ app.get("/urls/new", (req, res) => {
 
   if (users[req.cookies["user_id"]]) {
     res.render("urls_new", templateVars);
-  } else {
-    res.redirect("/login"); // If not logged in, user will be redirected to /login page
   }
-  
+  res.redirect("/login"); // If not logged in, user will be redirected to /login page
 });
 
 // TinyURL info page
@@ -85,17 +83,20 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"]
   };
-  res.render("urls_show", templateVars);
+
+  if (users[req.cookies["user_id"]]) {
+    res.render("urls_show", templateVars);
+  }
+  res.send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.");
 });
 
-// Redirect to longURL
+// Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
-  if (users[req.params.id]) {
+  if (urlDatabase[req.params.id]) {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
-  } else {
-    res.send("The Short URL ID does not exist.\n");
   }
+  res.send("The Short URL ID does not exist.\n");
 });
 
 // Register page
@@ -107,9 +108,8 @@ app.get("/register", (req, res) => {
 
   if (users[req.cookies["user_id"]]) {
     res.redirect("/urls");  // Redirect logged in users to /urls page
-  } else {
-    res.render("urls_registration", templateVars);
   }
+  res.render("urls_registration", templateVars);
 });
 
 // Login page
@@ -160,7 +160,7 @@ app.post("/login", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else if (user !== null && user.password !== password) { // email is found but password does not match
-    res.status(403).send("The password is incorrect.");
+    res.status(403).send("The password is incorrect. Please <a href='http://localhost:8080/login'>try again</a>.");
   } else if (user === null) { // email is not found
     res.status(403).send("The user with this email address is not found.");
   }
