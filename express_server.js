@@ -10,6 +10,9 @@ app.use(cookieParser());
 // Import helper functions
 const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require("./helperFunctions");
 
+const logInLink = `<a href='http://localhost:${PORT}/login'>log in</a>`;
+const registerLink = `<a href='http://localhost:${PORT}/register'>register</a>`;
+
 const urlDatabase = {   // The urlDatabase contain multiple 'urlID' objects, which contains the long url and the userID (cookie)
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -59,7 +62,7 @@ app.get("/urls", (req, res) => {
   if (users[req.cookies["user_id"]]) {
     res.render("urls_index", templateVars);
   }
-  res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your Shortened URLs list.\n");
+  res.status(403).send(`Please ${logInLink} or ${registerLink} to view your Shortened URLs list.\n`);
 });
 
 // Create TinyURL page
@@ -84,11 +87,11 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"]
   };
-
+  
   if (users[req.cookies["user_id"]] && checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
     res.render("urls_show", templateVars);
   } else if (users[req.cookies["user_id"]] === undefined) {
-    res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to view your TinyURL page.\n");
+    res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURL page.\n`);
   }
   // When a logged in user tries to access the TinyURL info page which belongs to another user.
   res.status(403).send("Unauthorized request. You do not own this TinyURL.");
@@ -100,7 +103,7 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
-  res.status(404).send("The Short URL ID does not exist.\n");
+  res.status(404).send("The TinyURL ID does not exist.\n");
 });
 
 // Register page
@@ -135,7 +138,7 @@ app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   const longURL = req.body.longURL;
   if (!users[req.cookies["user_id"]]) {
-    res.status(403).send("Please <a href='http://localhost:8080/login'>log in</a> or <a href='http://localhost:8080/register'>register</a> to generate shortened URLs.\n");
+    res.status(403).send(`Please ${logInLink} or ${registerLink} to generate shortened URLs.\n`);
   } else if (!(longURL.includes("https://") || longURL.includes("http://"))) {
     urlDatabase[randomString] = { longURL: `https://${longURL}`, userID: req.cookies["user_id"]};
   } else {
@@ -155,9 +158,9 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
   } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
     // Case when urlID does not exists in the entire database
-    res.status(404).send("Unable to perform delete request as this TinyURL does not exist\n");
+    res.status(404).send("This TinyURL does not exist.\n");
   }
-  res.status(401).send("Unauthorized request to delete the TinyURL. Please <a href='http://localhost:8080/login'>log in</a> to delete your TinyURL.\n");  // user is not logged in
+  res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
 });
 
 // POST handler to update existing URL
@@ -168,12 +171,12 @@ app.post("/urls/:id", (req, res) => {
     res.redirect("/urls");
   } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
     // Case when user is logged in, user does not own the url, and the urlID exists in the database
-    res.status(401).send("Unauthorized request to modify the TinyURL. This user does not own the TinyURL.\n");
+    res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
   } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
     // Case when urlID does not exists in the entire database
-    res.status(404).send("Unable to perform edit request as this TinyURL does not exist\n");
+    res.status(404).send("This TinyURL does not exist.\n");
   }
-  res.status(401).send("Unauthorized request to modify the TinyURL. Please <a href='http://localhost:8080/login'>log in</a> to edit your TinyURL.\n");
+  res.status(401).send(`Unauthorized request. Please ${logInLink} to view or modify your TinyURL.\n`);
 });
 
 // POST to login page
@@ -184,7 +187,7 @@ app.post("/login", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else if (user !== null && user.password !== password) { // email is found but password does not match
-    res.status(400).send("The password is incorrect. Please <a href='http://localhost:8080/login'>try again</a>.\n");
+    res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
   } else if (user === null) { // email is not found
     res.status(404).send("The user with this email address is not found.\n");
   }
