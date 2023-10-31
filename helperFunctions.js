@@ -18,4 +18,15 @@ const getUserByEmail = function(email, userDatabase) {
   return null;
 };
 
-module.exports = { generateRandomString, getUserByEmail };
+// Makes a copy of the database, returning only urlID objects with the userID specified
+const urlsForUser = function(id, urlDatabase) {
+  let urls = {};
+  for (let urlID in urlDatabase) {
+    if (id === urlDatabase[urlID].userID) {
+      urls[urlID] = urlDatabase[urlID];
+    }
+  }
+  return urls;
+};
+
+module.exports = { generateRandomString, getUserByEmail, urlsForUser };
