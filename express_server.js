@@ -152,18 +152,28 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id];
   } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
     // Case when user is logged in, user does not own the url, and the urlID exists in the database
-    res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+    res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
   } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
     // Case when urlID does not exists in the entire database
     res.status(404).send("Unable to perform delete request as this TinyURL does not exist\n");
   }
-  res.status(401).send("Unauthorized request. Please <a href='http://localhost:8080/login'>log in</a> to delete your TinyURL.\n");  // user is not logged in
+  res.status(401).send("Unauthorized request to delete the TinyURL. Please <a href='http://localhost:8080/login'>log in</a> to delete your TinyURL.\n");  // user is not logged in
 });
 
 // POST handler to update existing URL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id].longURL = req.body.UpdatedLongURL;
-  res.redirect("/urls");
+  // check if the user has permission to modify the urlID
+  if (checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
+    urlDatabase[req.params.id].longURL = req.body.UpdatedLongURL;
+    res.redirect("/urls");
+  } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+    // Case when user is logged in, user does not own the url, and the urlID exists in the database
+    res.status(401).send("Unauthorized request to modify the TinyURL. This user does not own the TinyURL.\n");
+  } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+    // Case when urlID does not exists in the entire database
+    res.status(404).send("Unable to perform edit request as this TinyURL does not exist\n");
+  }
+  res.status(401).send("Unauthorized request to modify the TinyURL. Please <a href='http://localhost:8080/login'>log in</a> to edit your TinyURL.\n");
 });
 
 // POST to login page
