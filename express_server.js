@@ -215,19 +215,29 @@ app.post("/urls/:id", (req, res) => {
   return res.status(401).send(`Unauthorized request. Please ${logInLink} to view or modify your TinyURL.\n`);
 });
 
+
 // POST to login page
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = getUserByEmail(email, users);
-  if (user !== null && user.password === password) {  // successful login
+
+  // Successful login
+  if (user !== null && user.password === password) {
     res.cookie("user_id", user.id);
-    res.redirect("/urls");
-  } else if (user !== null && user.password !== password) { // email is found but password does not match
-    res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
-  } else if (user === null) { // email is not found
-    res.status(404).send("The user with this email address is not found.\n");
+    return res.redirect("/urls");
+  }
+  
+  // Email is found but password does not match
+  if (user !== null && user.password !== password) {
+    return res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
+  }
+  
+  // Email is not found
+  if (user === null) {
+    return res.status(404).send("The user with this email address is not found.\n");
   }
 });
+
 
 // Logout Endpoint that clears username cookie and redirects user back to /login page
 app.post("/logout", (req, res) => {
