@@ -93,7 +93,7 @@ app.get("/urls/:id", (req, res) => {
   // Render TinyURL info page if the user is logged in and owns that TinyURL
   if (users[req.cookies["user_id"]] && checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
     return res.render("urls_show", templateVars);
-  } 
+  }
   
   // User is not logged in
   if (users[req.cookies["user_id"]] === undefined) {
@@ -137,24 +137,30 @@ app.get("/login", (req, res) => {
   
   // Redirect logged in users to /urls page
   if (users[req.cookies["user_id"]]) {
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
   
-  res.render("urls_login", templateVars);
+  return res.render("urls_login", templateVars);
 });
 
 // POST handler to generate short URL id when longURL is submitted
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   const longURL = req.body.longURL;
+
+  // Send error message to users that are not logged in
   if (!users[req.cookies["user_id"]]) {
-    res.status(403).send(`Please ${logInLink} or ${registerLink} to generate shortened URLs.\n`);
-  } else if (!(longURL.includes("https://") || longURL.includes("http://"))) {
+    return res.status(403).send(`Please ${logInLink} or ${registerLink} to generate shortened URLs.\n`);
+  }
+  
+  // Ensure that URLs are stored with the correct protocol
+  if (!(longURL.includes("https://") || longURL.includes("http://"))) {
     urlDatabase[randomString] = { longURL: `https://${longURL}`, userID: req.cookies["user_id"]};
   } else {
     urlDatabase[randomString] = { longURL, userID: req.cookies["user_id"] };
   }
-  res.redirect(`/urls/${randomString}`);
+  
+  return res.redirect(`/urls/${randomString}`);
 });
 
 // POST handler for the delete function
