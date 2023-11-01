@@ -237,7 +237,7 @@ app.post("/login", (req, res) => {
   
   // Email is not found
   if (user === null) {
-    return res.status(404).send("The user with this email address is not found.\n");
+    return res.status(404).send(`The user with this email address is not found. Please ${registerLink} to log in.\n`);
   }
 });
 
@@ -270,7 +270,7 @@ app.post("/register", (req, res) => {
     email,
     password: hashedPassword
   };
-  console.log(users);
+  
   res.cookie("user_id", id);  // set a user_id cookie containing the user's newly generated ID
   res.redirect("/urls");
 });
