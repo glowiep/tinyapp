@@ -1,5 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser"); // Express middleware that facilitates working with cookies
+const bcrypt = require("bcryptjs");  // Store passwords securely with bcrypt
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -29,12 +31,12 @@ const users = {
   aJ48lW: {
     id: "aJ48lW",
     email: "user1@gmail.com",
-    password: "test123",
+    password: bcrypt.hashSync("test123", 10),
   },
   oA10iQ: {
     id: "oA10iQ",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("dishwasher-funk", 10),
   },
 };
 
@@ -61,9 +63,10 @@ app.get("/urls", (req, res) => {
   };
 
   if (users[req.cookies["user_id"]]) {
-    res.render("urls_index", templateVars);
+    return res.render("urls_index", templateVars);
   }
-  res.status(403).send(`Please ${logInLink} or ${registerLink} to view your Shortened URLs list.\n`);
+  
+  return res.status(403).send(`Please ${logInLink} or ${registerLink} to view your Shortened URLs list.\n`);
 });
 
 
@@ -76,11 +79,11 @@ app.get("/urls/new", (req, res) => {
 
   // Render page if the user exists in the database
   if (users[req.cookies["user_id"]]) {
-    res.render("urls_new", templateVars);
+    return res.render("urls_new", templateVars);
   }
 
   // If not logged in, user will be redirected to /login page
-  res.redirect("/login");
+  return res.redirect("/login");
 });
 
 
@@ -222,13 +225,13 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email, users);
 
   // Successful login
-  if (user !== null && user.password === password) {
+  if (user !== null && bcrypt.compareSync(password, user.password)) {
     res.cookie("user_id", user.id);
     return res.redirect("/urls");
   }
   
   // Email is found but password does not match
-  if (user !== null && user.password !== password) {
+  if (user !== null && !bcrypt.compareSync(password, user.password)) {
     return res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
   }
   
@@ -245,10 +248,12 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+
 // POST handler to handle registration form data
 app.post("/register", (req, res) => {
   const id = generateRandomString();   // unique user id
   const { email, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
@@ -263,11 +268,13 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email,
-    password
+    password: hashedPassword
   };
+  console.log(users);
   res.cookie("user_id", id);  // set a user_id cookie containing the user's newly generated ID
   res.redirect("/urls");
 });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
