@@ -50,6 +50,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+
 // My URLs landing page
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -64,6 +65,7 @@ app.get("/urls", (req, res) => {
   }
   res.status(403).send(`Please ${logInLink} or ${registerLink} to view your Shortened URLs list.\n`);
 });
+
 
 // Create TinyURL page
 app.get("/urls/new", (req, res) => {
@@ -80,6 +82,7 @@ app.get("/urls/new", (req, res) => {
   // If not logged in, user will be redirected to /login page
   res.redirect("/login");
 });
+
 
 // TinyURL info page
 app.get("/urls/:id", (req, res) => {
@@ -104,6 +107,7 @@ app.get("/urls/:id", (req, res) => {
   return res.status(403).send("Unauthorized request. You do not own this TinyURL.");
 });
 
+
 // Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
   if (urlDatabase[req.params.id]) {
@@ -112,6 +116,7 @@ app.get("/u/:id", (req, res) => {
   }
   res.status(404).send("The TinyURL ID does not exist.\n");
 });
+
 
 // Register page
 app.get("/register", (req, res) => {
@@ -128,6 +133,7 @@ app.get("/register", (req, res) => {
   return res.render("urls_registration", templateVars);
 });
 
+
 // Login page
 app.get("/login", (req, res) => {
   const templateVars = {
@@ -142,6 +148,7 @@ app.get("/login", (req, res) => {
   
   return res.render("urls_login", templateVars);
 });
+
 
 // POST handler to generate short URL id when longURL is submitted
 app.post("/urls", (req, res) => {
@@ -163,6 +170,7 @@ app.post("/urls", (req, res) => {
   return res.redirect(`/urls/${randomString}`);
 });
 
+
 // POST handler for the delete function
 app.post("/urls/:id/delete", (req, res) => {
   // The user has permission to delete the TinyURL only if the TinyURL belongs to the user
@@ -181,23 +189,30 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(404).send("This TinyURL does not exist.\n");
   }
 
+  // Users that are not logged in are not authorized
   return res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
 });
 
 // POST handler to update existing URL
 app.post("/urls/:id", (req, res) => {
-  // check if the user has permission to modify the urlID
+  // Check if the user has permission to modify the urlID
   if (checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
     urlDatabase[req.params.id].longURL = req.body.UpdatedLongURL;
-    res.redirect("/urls");
-  } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
-    // Case when user is logged in, user does not own the url, and the urlID exists in the database
-    res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
-  } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
-    // Case when urlID does not exists in the entire database
-    res.status(404).send("This TinyURL does not exist.\n");
+    return res.redirect("/urls");
   }
-  res.status(401).send(`Unauthorized request. Please ${logInLink} to view or modify your TinyURL.\n`);
+  
+  // When user is logged in but does not own the url, and the urlID exists in the database
+  if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+    return res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+  }
+  
+  // When the urlID does not exists in the entire database
+  if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+    return res.status(404).send("This TinyURL does not exist.\n");
+  }
+  
+  // Users that are not logged in are not authorized
+  return res.status(401).send(`Unauthorized request. Please ${logInLink} to view or modify your TinyURL.\n`);
 });
 
 // POST to login page
