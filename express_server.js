@@ -72,9 +72,11 @@ app.get("/urls/new", (req, res) => {
     user_id: req.cookies["user_id"]
   };
 
+  // Render page if the user exists in the database
   if (users[req.cookies["user_id"]]) {
     res.render("urls_new", templateVars);
   }
+  
   // If not logged in, user will be redirected to /login page
   res.redirect("/login");
 });
@@ -88,13 +90,18 @@ app.get("/urls/:id", (req, res) => {
     user_id: req.cookies["user_id"]
   };
   
+  // Render TinyURL info page if the user is logged in and owns that TinyURL
   if (users[req.cookies["user_id"]] && checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
-    res.render("urls_show", templateVars);
-  } else if (users[req.cookies["user_id"]] === undefined) {
-    res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURL page.\n`);
+    return res.render("urls_show", templateVars);
+  } 
+  
+  // User is not logged in
+  if (users[req.cookies["user_id"]] === undefined) {
+    return res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURL page.\n`);
   }
+
   // When a logged in user tries to access the TinyURL info page which belongs to another user.
-  res.status(403).send("Unauthorized request. You do not own this TinyURL.");
+  return res.status(403).send("Unauthorized request. You do not own this TinyURL.");
 });
 
 // Redirect to longURL. User does not need to be logged in.
