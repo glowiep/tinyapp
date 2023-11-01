@@ -76,7 +76,7 @@ app.get("/urls/new", (req, res) => {
   if (users[req.cookies["user_id"]]) {
     res.render("urls_new", templateVars);
   }
-  
+
   // If not logged in, user will be redirected to /login page
   res.redirect("/login");
 });
@@ -120,10 +120,12 @@ app.get("/register", (req, res) => {
     user_id: req.cookies["user_id"]
   };
 
+  // Redirect logged in users to /urls page
   if (users[req.cookies["user_id"]]) {
-    res.redirect("/urls");  // Redirect logged in users to /urls page
+    return res.redirect("/urls");
   }
-  res.render("urls_registration", templateVars);
+  
+  return res.render("urls_registration", templateVars);
 });
 
 // Login page
