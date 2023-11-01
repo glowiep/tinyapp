@@ -135,11 +135,12 @@ app.get("/login", (req, res) => {
     user_id: req.cookies["user_id"]
   };
   
+  // Redirect logged in users to /urls page
   if (users[req.cookies["user_id"]]) {
-    res.redirect("/urls");  // Redirect logged in users to /urls page
-  } else {
-    res.render("urls_login", templateVars);
+    res.redirect("/urls");
   }
+  
+  res.render("urls_login", templateVars);
 });
 
 // POST handler to generate short URL id when longURL is submitted
