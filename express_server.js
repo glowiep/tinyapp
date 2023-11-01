@@ -159,24 +159,29 @@ app.post("/urls", (req, res) => {
   } else {
     urlDatabase[randomString] = { longURL, userID: req.cookies["user_id"] };
   }
-  
+
   return res.redirect(`/urls/${randomString}`);
 });
 
 // POST handler for the delete function
 app.post("/urls/:id/delete", (req, res) => {
-  // check if the user has permission to delete the urlID
+  // The user has permission to delete the TinyURL only if the TinyURL belongs to the user
   if (checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase)) {
-    res.redirect("/urls");
     delete urlDatabase[req.params.id];
-  } else if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
-    // Case when user is logged in, user does not own the url, and the urlID exists in the database
-    res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
-  } else if (!checkUrlIdExists(req.params.id, urlDatabase)) {
-    // Case when urlID does not exists in the entire database
-    res.status(404).send("This TinyURL does not exist.\n");
+    return res.redirect("/urls");
   }
-  res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
+  
+  // When user is logged in but does not own the url, and the urlID exists in the database
+  if (users[req.cookies["user_id"]] && !checkUrlId(req.params.id, req.cookies["user_id"], urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+    return res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
+  }
+  
+  // When the urlID does not exists in the entire database
+  if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+    return res.status(404).send("This TinyURL does not exist.\n");
+  }
+
+  return res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
 });
 
 // POST handler to update existing URL
