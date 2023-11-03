@@ -221,21 +221,24 @@ app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = getUserByEmail(email, users);
 
-  // Successful login
-  if (user !== null && bcrypt.compareSync(password, user.password)) {
+  // Check if email or password are empty strings
+  if (email === "" || password === "") {
+    return  res.status(400).send(`The Email and Password fields must not be empty. Try to ${logInLink} again.\n`);
+  }
+
+  // Email is not found
+  if (user === null) {
+    return res.status(404).send(`The user with this email address is not found. Please ${registerLink} to log in.\n`);
+  }
+  
+  // Happy path - successful login
+  if (bcrypt.compareSync(password, user.password)) {
     req.session.user_id = user.id;
     return res.redirect("/urls");
   }
   
   // Email is found but password does not match
-  if (user !== null && !bcrypt.compareSync(password, user.password)) {
-    return res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
-  }
-  
-  // Email is not found
-  if (user === null) {
-    return res.status(404).send(`The user with this email address is not found. Please ${registerLink} to log in.\n`);
-  }
+  return res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
 });
 
 
@@ -269,7 +272,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
   
-  // set a the session cookie as the user's newly generated ID
+  // Set a the session cookie as the user's newly generated ID
   req.session.user_id = id;
   res.redirect("/urls");
 });
