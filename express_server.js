@@ -1,11 +1,11 @@
 const express = require("express");
-// Express middleware that facilitates working with cookies
-const cookieSession = require("cookie-session");
+
+const cookieSession = require("cookie-session");  // Express middleware that facilitates working with cookies
 const bcrypt = require("bcryptjs");  // Store passwords securely with bcrypt
 
-const app = express();
-const PORT = 8080; // default port 8080
+const { PORT, logInLink, registerLink, urlDatabase, users } = require("./constants");  // Import constants
 
+const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true}));
 app.use(cookieSession({
@@ -17,35 +17,12 @@ app.use(cookieSession({
 }));
 
 // Import helper functions
-const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require("./helpers");
-
-const logInLink = `<a href='http://localhost:${PORT}/login'>log in</a>`;
-const registerLink = `<a href='http://localhost:${PORT}/register'>register</a>`;
-
-const urlDatabase = {   // The urlDatabase contain multiple 'urlID' objects, which contains the long url and the userID (used to set session cookie)
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
-
-// To store and access users
-const users = {
-  aJ48lW: {
-    id: "aJ48lW",
-    email: "user1@gmail.com",
-    password: bcrypt.hashSync("test123", 10),
-  },
-  oA10iQ: {
-    id: "oA10iQ",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("dishwasher-funk", 10),
-  },
-};
+const {
+  generateRandomString,
+  getUserByEmail,
+  urlsForUser,
+  checkUrlId,
+  checkUrlIdExists } = require("./helpers");
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -138,7 +115,7 @@ app.get("/register", (req, res) => {
   const userID = req.session.user_id;
   const templateVars = {
     users,
-    user_id: user
+    user_id: userID
   };
 
   // Redirect logged in users to /urls page
@@ -158,12 +135,12 @@ app.get("/login", (req, res) => {
     user_id: userID
   };
   
-  // Redirect logged in users to /urls page
-  if (users[userID]) {
-    return res.redirect("/urls");
+  if (!users[userID]) {
+    return res.render("urls_login", templateVars);
   }
-  
-  return res.render("urls_login", templateVars);
+
+  // Redirect logged in users to /urls page
+  return res.redirect("/urls");
 });
 
 
@@ -278,7 +255,7 @@ app.post("/register", (req, res) => {
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
-    return  res.status(400).send("The Email and Password field must not be empty.\n");
+    return  res.status(400).send(`The Email and Password field must not be empty. Try to ${registerLink} again.\n`);
   }
 
   // Check if email already exists
