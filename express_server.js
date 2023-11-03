@@ -16,7 +16,7 @@ app.use(cookieSession({
 }));
 
 // Import helper functions
-const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require("./helperFunctions");
+const { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require("./helpers");
 
 const logInLink = `<a href='http://localhost:${PORT}/login'>log in</a>`;
 const registerLink = `<a href='http://localhost:${PORT}/register'>register</a>`;
