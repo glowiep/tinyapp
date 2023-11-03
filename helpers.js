@@ -32,14 +32,14 @@ const getUserByEmail = function(email, userDatabase) {
 /**
  * Make a copy of the database with only urlID objects for the userID specified
  * 
- * @param {string} id - user ID
+ * @param {string} userID - user ID
  * @param {object} urlDatabase - user database object
  * @returns {object} copy of the urlDatabase containing only the url ID objects of the userID specified
  */
-const urlsForUser = function(id, urlDatabase) {
+const urlsForUser = function(userID, urlDatabase) {
   let urls = {};
   for (let urlID in urlDatabase) {
-    if (id === urlDatabase[urlID].userID) {
+    if (userID === urlDatabase[urlID].userID) {
       urls[urlID] = urlDatabase[urlID];
     }
   }
