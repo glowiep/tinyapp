@@ -3,7 +3,8 @@ const express = require("express");
 const cookieSession = require("cookie-session");  // Express middleware that facilitates working with cookies
 const bcrypt = require("bcryptjs");  // Store passwords securely with bcrypt
 
-const { PORT, logInLink, registerLink, urlDatabase, users } = require("./constants");  // Import constants
+// Import constants
+const { PORT, logInLink, registerLink, urlDatabase, users } = require("./constants");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -43,7 +44,7 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     users,
     user_id: userID,
-    // filter list in urlDatabase to show only the user's URLs
+    // filter urlDatabase to show only a copy of the database relevant to the userID
     urls: urlsForUser(userID, urlDatabase)
   };
 
@@ -77,25 +78,30 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
+  // Check if urlID exists in the entire database
+  if (!checkUrlIdExists(urlID, urlDatabase)) {
+    return res.status(404).send("This TinyURL does not exist.\n");
+  }
+  
   const templateVars = {
     users,
     id: urlID,
     longURL: urlDatabase[urlID].longURL,
     user_id: userID
   };
-  
-  // Render TinyURL info page if the user is logged in and owns that TinyURL
-  if (users[userID] && checkUrlId(urlID, userID, urlDatabase)) {
-    return res.render("urls_show", templateVars);
-  }
-  
+
   // User is not logged in
-  if (users[userID] === undefined) {
+  if (!users[userID]) {
     return res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURL page.\n`);
   }
 
   // When a logged in user tries to access the TinyURL info page which belongs to another user.
-  return res.status(403).send("Unauthorized request. You do not own this TinyURL.");
+  if (!checkUrlId(urlID, userID, urlDatabase)) {
+    return res.status(403).send("Unauthorized request. You do not own this TinyURL.");
+  }
+  
+  // Happy path - Render TinyURL info page if the user is logged in and owns the TinyURL
+  return res.render("urls_show", templateVars);
 });
 
 
@@ -104,9 +110,9 @@ app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
   if (urlDatabase[urlID]) {
     const longURL = urlDatabase[urlID].longURL;
-    res.redirect(longURL);
+    return res.redirect(longURL);
   }
-  res.status(404).send("The TinyURL ID does not exist.\n");
+  return res.status(404).send("The TinyURL ID does not exist.\n");
 });
 
 
