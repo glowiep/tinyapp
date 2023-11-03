@@ -1,5 +1,6 @@
 const express = require("express");
-const cookieSession = require("cookie-session"); // Express middleware that facilitates working with cookies
+// Express middleware that facilitates working with cookies
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");  // Store passwords securely with bcrypt
 
 const app = express();
@@ -98,15 +99,16 @@ app.get("/urls/new", (req, res) => {
 // TinyURL info page
 app.get("/urls/:id", (req, res) => {
   const user = req.session.user_id;
+  const urlID = req.params.id;
   const templateVars = {
     users,
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
+    id: urlID,
+    longURL: urlDatabase[urlID].longURL,
     user_id: user
   };
   
   // Render TinyURL info page if the user is logged in and owns that TinyURL
-  if (users[user] && checkUrlId(req.params.id, user, urlDatabase)) {
+  if (users[user] && checkUrlId(urlID, user, urlDatabase)) {
     return res.render("urls_show", templateVars);
   }
   
@@ -122,8 +124,9 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
-  if (urlDatabase[req.params.id]) {
-    const longURL = urlDatabase[req.params.id].longURL;
+  const urlID = req.params.id;
+  if (urlDatabase[urlID]) {
+    const longURL = urlDatabase[urlID].longURL;
     res.redirect(longURL);
   }
   res.status(404).send("The TinyURL ID does not exist.\n");
@@ -187,44 +190,47 @@ app.post("/urls", (req, res) => {
 
 
 // POST handler for the delete function
-app.post("/urls/:id/delete", (req, res) => {  //http://localhost:8080/urls/i3BoGr/delete
+app.post("/urls/:id/delete", (req, res) => {
   const user = req.session.user_id;
+  const urlID = req.params.id;
   // The user has permission to delete the TinyURL only if the TinyURL belongs to the user
-  if (checkUrlId(req.params.id, user, urlDatabase)) {
-    delete urlDatabase[req.params.id];
-    res.redirect("/urls");
+  if (checkUrlId(urlID, user, urlDatabase)) {
+    delete urlDatabase[urlID];
+    return res.redirect("/urls");
   }
   
   // When user is logged in but does not own the url, and the urlID exists in the database
-  if (users[user] && !checkUrlId(req.params.id, user, urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+  if (users[user] && !checkUrlId(urlID, user, urlDatabase) && checkUrlIdExists(urlID, urlDatabase)) {
     return res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
   }
   
   // When the urlID does not exists in the entire database
-  if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+  if (!checkUrlIdExists(urlID, urlDatabase)) {
     return res.status(404).send("This TinyURL does not exist.\n");
   }
 
   // Users that are not logged in are not authorized
-  return res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);
+  return res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
 });
 
 // POST handler to update existing URL
 app.post("/urls/:id", (req, res) => {
   const user = req.session.user_id;
+  const urlID = req.params.id;
+
   // Check if the user has permission to modify the urlID
-  if (checkUrlId(req.params.id, user, urlDatabase)) {
-    urlDatabase[req.params.id].longURL = req.body.UpdatedLongURL;
+  if (checkUrlId(urlID, user, urlDatabase)) {
+    urlDatabase[urlID].longURL = req.body.UpdatedLongURL;
     return res.redirect("/urls");
   }
   
   // When user is logged in but does not own the url, and the urlID exists in the database
-  if (users[user] && !checkUrlId(req.params.id, user, urlDatabase) && checkUrlIdExists(req.params.id, urlDatabase)) {
+  if (users[user] && !checkUrlId(urlID, user, urlDatabase) && checkUrlIdExists(urlID, urlDatabase)) {
     return res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
   }
   
   // When the urlID does not exists in the entire database
-  if (!checkUrlIdExists(req.params.id, urlDatabase)) {
+  if (!checkUrlIdExists(urlID, urlDatabase)) {
     return res.status(404).send("This TinyURL does not exist.\n");
   }
   
