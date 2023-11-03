@@ -193,24 +193,24 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
-  // The user has permission to delete the TinyURL only if the TinyURL belongs to the user
-  if (checkUrlId(urlID, userID, urlDatabase)) {
-    delete urlDatabase[urlID];
-    return res.redirect("/urls");
+
+  if (!userID) {  // if the user is not logged in
+    return res.status(401).send(`Unauthorized request. Please ${logInLink} to delete your TinyURL.\n`);
   }
   
-  // When user is logged in but does not own the url, and the urlID exists in the database
-  if (users[userID] && !checkUrlId(urlID, userID, urlDatabase) && checkUrlIdExists(urlID, urlDatabase)) {
-    return res.status(401).send("Unauthorized request delete the TinyURL. This user does not own the TinyURL.\n");
-  }
-  
-  // When the urlID does not exists in the entire database
+  // Check if urlID exists in the entire database
   if (!checkUrlIdExists(urlID, urlDatabase)) {
     return res.status(404).send("This TinyURL does not exist.\n");
   }
 
-  // Users that are not logged in are not authorized
-  return res.status(401).send(`Unauthorized request to delete the TinyURL. Please ${logInLink} to delete your TinyURL.\n`);  // user is not logged in
+  // Check if the user has permission to delete the urlID
+  if (!checkUrlId(urlID, userID, urlDatabase)) {
+    return res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+  }
+  
+  // Happy path - User is logged in, owns the url, and the urlID exists in the database
+  delete urlDatabase[urlID];
+  return res.redirect("/urls");
 });
 
 
@@ -236,7 +236,6 @@ app.post("/urls/:id", (req, res) => {
   // Happy path - User is logged in, owns the url, and the urlID exists in the database
   urlDatabase[urlID].longURL = req.body.UpdatedLongURL;
   return res.redirect("/urls");
-  
 });
 
 
