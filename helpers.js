@@ -71,19 +71,20 @@ const checkUrlId = function(urlID, userID, urlDatabase) {
  */
 const getUniqueVisitorCount = function(visitorList) {
   let uniqueList = [];
-
+  let count = 0;
   // To handle empty list for newly created accounts
   if (visitorList.length === 0) {
-    return 0;
+    return count;
   }
-
-  for (let visit of visitorList) {
+  
+  for (let visit in visitorList) {
     const visitorID = visit[0];
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
       uniqueList.push(visitorID);
     }
   }
-  return uniqueList.length;
+  count = uniqueList.length;
+  return count;
 };
 
 module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, getUniqueVisitorCount };
