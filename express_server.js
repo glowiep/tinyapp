@@ -198,6 +198,11 @@ app.post("/urls", (req, res) => {
   if (!users[userID]) {
     return res.status(403).send(`${unauthorizedUpdateMsg}`);
   }
+
+  // Does not create a new TinyURL when no longURL is entered
+  if (longURL === "") {
+    return res.redirect("/urls/new");
+  }
   
   // Ensure that URLs are stored with the correct protocol
   if (!(longURL.includes("https://") || longURL.includes("http://"))) {
