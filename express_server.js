@@ -158,7 +158,7 @@ app.get("/u/:id", (req, res) => {
   req.session.visitorID = newVisitorID;
   urlIDObject.totalVisits += 1;
   urlIDObject.visitorID.push([req.session.visitorID, currentTime]);
-  urlIDObject.uniqueVisits = getUniqueVisitorCount(urlIDObject.totalVisits);
+  urlIDObject.uniqueVisits = getUniqueVisitorCount(urlIDObject.visitorID);
   return res.redirect(longURL);
 });
 
