@@ -14,7 +14,7 @@ const generateRandomString = function() {
 
 /**
  * Find the user object based on email
- * 
+ *
  * @param {string} email - user email
  * @param {object} userDatabase - user database object
  * @returns {object} user object based on email, return null if not found
@@ -31,7 +31,7 @@ const getUserByEmail = function(email, userDatabase) {
 
 /**
  * Make a copy of the database with only urlID objects for the userID specified
- * 
+ *
  * @param {string} userID - user ID
  * @param {object} urlDatabase - user database object
  * @returns {object} copy of the urlDatabase containing only the url ID objects of the userID specified
@@ -49,10 +49,10 @@ const urlsForUser = function(userID, urlDatabase) {
 
 /**
  * Check if the user owns the TinyURL
- * 
+ *
  * @param {string} urlID - TinyURL identifier
  * @param {string} userID - user ID of the user session
- * @param {object} urlDatabase - user database object 
+ * @param {object} urlDatabase - user database object
  * @returns {boolean} Returns true if the urlID exists for the userID specified
  */
 const checkUrlId = function(urlID, userID, urlDatabase) {
@@ -63,5 +63,21 @@ const checkUrlId = function(urlID, userID, urlDatabase) {
   return false;
 };
 
+/**
+ * Get the number of unique visitors, based on the visitor IDs in a visitor list.
+ *
+ * @param {Object[]} visitorList - Array of arrays with 2 items, the visitor ID and timestamp
+ * @returns {number} Returns the number of unique visitors
+ */
+const getUniqueVisitorCount = function(visitorList) {
+  let uniqueList = [];
+  for (let visit of visitorList) {
+    const visitorID = visit[0];
+    if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
+      uniqueList.push(visitorID);
+    }
+  }
+  return uniqueList.length;
+};
 
-module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId };
+module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, getUniqueVisitorCount };
