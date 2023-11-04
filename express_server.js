@@ -201,7 +201,7 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   const randomString = generateRandomString();
-  const longURL = req.body.longURL;
+  let longURL = req.body.longURL;
 
   // Send error message to users that are not logged in
   if (!users[userID]) {
@@ -213,16 +213,9 @@ app.post("/urls", (req, res) => {
     return res.redirect("/urls/new");
   }
   
-  // Ensure that URLs are stored with the correct protocol
+  // Ensure the long URL is stored with the correct protocol
   if (!(longURL.includes("https://") || longURL.includes("http://"))) {
-    urlDatabase[randomString] = {
-      longURL: `https://${longURL}`,
-      userID,
-      visitorID: [],
-      totalVisits: 0,
-      uniqueVisits: 0
-    };
-    return res.redirect(`/urls/${randomString}`);
+    longURL = `https://${longURL}`;
   }
 
   // Happy path - Save TinyURL to database and redirect to /urls/:id page
@@ -267,6 +260,7 @@ app.delete("/urls/:id/delete", (req, res) => {
 app.put("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
+  let newlongURL = req.body.UpdatedLongURL;
 
   if (!userID) {  // if the user is not logged in
     return res.status(401).send(`${unauthorizedUpdateMsg}`);
@@ -282,8 +276,13 @@ app.put("/urls/:id", (req, res) => {
     return res.status(401).send(`${doesNotOwnURLMsg}`);
   }
   
+  // Ensure the long URL is stored with the correct protocol
+  if (!(newlongURL.includes("https://") || newlongURL.includes("http://"))) {
+    newlongURL = `https://${newlongURL}`;
+  }
+
   // Happy path - User is logged in, owns the url, and the urlID exists in the database
-  urlDatabase[urlID].longURL = req.body.UpdatedLongURL;
+  urlDatabase[urlID].longURL = newlongURL;
   return res.redirect("/urls");
 });
 
