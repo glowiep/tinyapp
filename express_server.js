@@ -111,7 +111,10 @@ app.get("/urls/:id", (req, res) => {
     users,
     id: urlID,
     longURL: urlDatabase[urlID].longURL,
-    user_id: userID
+    user_id: userID,
+    visitorID:  urlDatabase[urlID].visitorID,
+    totalVisits: urlDatabase[urlID].totalVisits,
+    uniqueVisits: urlDatabase[urlID].uniqueVisits,
   };
 
   // User is not logged in
@@ -132,8 +135,14 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
-  if (urlDatabase[urlID]) {
-    const longURL = urlDatabase[urlID].longURL;
+  const longURL = urlDatabase[urlID].longURL;
+  const newVisitorID = generateRandomString();
+  const currentTime = new Date().toString();
+
+  if (urlDatabase[urlID]) { // Work in progress - need to add unique users count
+    req.session.visitorID = newVisitorID;
+    urlDatabase[urlID].totalVisits += 1;
+    urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
     return res.redirect(longURL);
   }
   return res.status(404).send(`${urlDoesNotExistMsg}`);
@@ -187,9 +196,21 @@ app.post("/urls", (req, res) => {
   
   // Ensure that URLs are stored with the correct protocol
   if (!(longURL.includes("https://") || longURL.includes("http://"))) {
-    urlDatabase[randomString] = { longURL: `https://${longURL}`, userID};
+    urlDatabase[randomString] = {
+      longURL: `https://${longURL}`,
+      userID,
+      visitorID: [],
+      totalVisits: 0,
+      uniqueVisits: 0
+    };
   } else {
-    urlDatabase[randomString] = { longURL, userID };
+    urlDatabase[randomString] = {
+      longURL,
+      userID,
+      visitorID: [],
+      totalVisits: 0,
+      uniqueVisits: 0
+    };
   }
 
   return res.redirect(`/urls/${randomString}`);
