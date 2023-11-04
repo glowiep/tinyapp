@@ -146,7 +146,7 @@ app.get("/u/:id", (req, res) => {
   const newVisitorID = generateRandomString();
   const currentTime = new Date().toString();
 
-  if (!req.session.isNew && req.session.visitorID) {  // Work in progress - need to add unique users count
+  if (!req.session.isNew && req.session.visitorID) {
     urlDatabase[urlID].totalVisits += 1;
     urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
     urlDatabase[urlID].uniqueVisits = getUniqueVisitorCount(urlDatabase[urlID].visitorID);
@@ -221,16 +221,17 @@ app.post("/urls", (req, res) => {
       totalVisits: 0,
       uniqueVisits: 0
     };
-  } else {
-    urlDatabase[randomString] = {
-      longURL,
-      userID,
-      visitorID: [],
-      totalVisits: 0,
-      uniqueVisits: 0
-    };
   }
 
+  // Happy path - Save TinyURL to database and redirect to /urls/:id page
+  urlDatabase[randomString] = {
+    longURL,
+    userID,
+    visitorID: [],
+    totalVisits: 0,
+    uniqueVisits: 0
+  };
+  
   return res.redirect(`/urls/${randomString}`);
 });
 
@@ -260,7 +261,7 @@ app.delete("/urls/:id/delete", (req, res) => {
 });
 
 
-// PUT handler to update existing URL
+// PUT handler to update existing URL (This does not reset the visitor Analytics)
 app.put("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
