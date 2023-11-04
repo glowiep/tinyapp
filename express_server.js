@@ -1,4 +1,5 @@
 const express = require("express");
+const methodOverride = require("method-override");
 
 const cookieSession = require("cookie-session");  // Express middleware that facilitates working with cookies
 const bcrypt = require("bcryptjs");  // Store passwords securely with bcrypt
@@ -9,6 +10,7 @@ const { PORT, logInLink, registerLink, urlDatabase, users } = require("./constan
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true}));
+app.use(methodOverride('_method'));  // override with POST having ?_method=DELETE
 app.use(cookieSession({
   name: "session",
   secret: "duX&FHG:W+zrKf#_2c5/pB",
@@ -172,8 +174,8 @@ app.post("/urls", (req, res) => {
 });
 
 
-// POST handler for the delete function
-app.post("/urls/:id/delete", (req, res) => {
+// DELETE handler for the delete function
+app.delete("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
 
@@ -197,8 +199,8 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 
-// POST handler to update existing URL
-app.post("/urls/:id", (req, res) => {
+// PUT handler to update existing URL
+app.put("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const urlID = req.params.id;
 
