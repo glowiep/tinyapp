@@ -23,7 +23,7 @@
       </div>
       <div class="card-footer text-muted">
         <h3 class="card-title">Edit</h3>
-        <form method="POST" action="/urls/<%= id %>">
+        <form method="POST" action="/urls/<%= id %>?_method=PUT">
           <label>New URL: </label>
           <input 
           name="UpdatedLongURL"
