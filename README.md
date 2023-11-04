@@ -5,10 +5,12 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 ### Main Page
 !["Main URL Page"](https://github.com/glowiep/tinyapp/blob/master/docs/main-page.png?raw=true)
-### Register Page
-!["Register Page"](https://github.com/glowiep/tinyapp/blob/master/docs/register-page.png?raw=true)
 ### TinyURL page
 !["TinyURL Page"](https://github.com/glowiep/tinyapp/blob/master/docs/tinyurl-page-with-analytics.png?raw=true)
+### Create TinyURL page
+!["Create TinyURL Page"](https://github.com/glowiep/tinyapp/blob/master/docs/create-tinyurl-page.png?raw=true)
+### Register Page
+!["Register Page"](https://github.com/glowiep/tinyapp/blob/master/docs/register-page.png?raw=true)
 
 ## Dependencies
 
