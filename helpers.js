@@ -76,7 +76,7 @@ const getUniqueVisitorCount = function(visitorList) {
   if (visitorList.length === 0) {
     return count;
   }
-  
+
   for (let visit in visitorList) {
     const visitorID = visit[0];
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
