@@ -66,35 +66,23 @@ const checkUrlId = function(urlID, userID, urlDatabase) {
 /**
  * Get the number of unique visitors, based on the visitor IDs in a visitor list.
  *
- * @param {Object[]} visitorList - Array of arrays with 2 items, the visitor ID and timestamp
+ * @param {Object[]} visitorList - Array of arrays where the inner array contains 2 items, the visitor ID and timestamp
  * @returns {number} Returns the number of unique visitors
  */
 const getUniqueVisitorCount = function(visitorList) {
   let uniqueList = [];
   let count = 0;
-  // To handle empty list for newly created accounts
-  if (visitorList.length === 0) {
-    return count;
+  if (!Array.isArray(visitorList)) {
+    return;
   }
-
-  // This is a unique visitor count bug fix to handle case for first time visit to the newly created URL in a new account
-  if (visitorList.length === 1) {
-    const visitorID = visitorList[0][0];
-    uniqueList.push(visitorID);
-    return uniqueList.length;
-  }
-
   for (let visit of visitorList) {
     const visitorID = visit[0];
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
       uniqueList.push(visitorID);
-    } else {
-      continue;
     }
+    count = uniqueList.length;
+    return count;
   }
-
-  count = uniqueList.length;
-  return count;
 };
 
 module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, getUniqueVisitorCount };
