@@ -34,6 +34,33 @@
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
+      <div style="margin: 1em;">
+        <h3>Analytics</h3>
+        <button type="button" class="btn btn-success">
+          TOTAL Visitors <span class="badge badge-light"><%= totalVisits %></span>
+          <span class="sr-only">Total TinyURL clicks</span>
+        </button>
+      </div>
+      <div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Visitor ID</th>
+              <th scope="col">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let i = 0; i < totalVisits; i++) { %>
+            <tr>
+              <th scope="row"><%= (i + 1) %></th>
+              <td><%= visitorID[i][0] %></td>
+              <td><%= visitorID[i][1] %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
     <!-- Bootstrap JS -->
     <script
