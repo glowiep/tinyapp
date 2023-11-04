@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists } = require('../helpers.js');
+const { getUserByEmail, urlsForUser, checkUrlId, getUniqueVisitorCount } = require('../helpers.js');
 
 const testUsers = {
   "aJ48lW": {
@@ -19,14 +19,33 @@ const testUrlDatabase = {
   b6UTxQ: {
     longURL: "https://www.youtube.com",
     userID: "aJ48lW",
+    visitorID: [
+      ["newvisitor1", 'Sat Nov 04 2023 01:17:07 GMT-0400 (Eastern Daylight Time)'],
+      ["newvisitor2", 'Sat Nov 04 2023 01:30:00 GMT-0400 (Eastern Daylight Time)']
+    ],
+    totalVisits: 2,
+    uniqueVisits: 2
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
+    visitorID: [
+      ["newvisit1", 'Sat Nov 04 2023 01:17:00 GMT-0400 (Eastern Daylight Time)'],
+      ["newvisit2", 'Sat Nov 04 2023 02:30:00 GMT-0400 (Eastern Daylight Time)'],
+      ["newvisit2", 'Sat Nov 04 2023 12:30:00 GMT-0400 (Eastern Daylight Time)']
+    ],
+    totalVisits: 3,
+    uniqueVisits: 2
   },
   p2ap12: {
     longURL: "https://www.cbc.ca",
     userID: "z0s0as",
+    visitorID: [
+      ["visitor1", 'Sat Nov 04 2023 04:20:00 GMT-0400 (Eastern Daylight Time)'],
+      ["visitor2", 'Sat Nov 04 2023 04:30:00 GMT-0400 (Eastern Daylight Time)']
+    ],
+    totalVisits: 2,
+    uniqueVisits: 2
   }
 };
 
@@ -62,10 +81,23 @@ describe('urlsForUser', function() {
       b6UTxQ: {
         longURL: "https://www.youtube.com",
         userID: "aJ48lW",
+        visitorID: [
+          ["newvisitor1", 'Sat Nov 04 2023 01:17:07 GMT-0400 (Eastern Daylight Time)'],
+          ["newvisitor2", 'Sat Nov 04 2023 01:30:00 GMT-0400 (Eastern Daylight Time)']
+        ],
+        totalVisits: 2,
+        uniqueVisits: 2
       },
       i3BoGr: {
         longURL: "https://www.google.ca",
         userID: "aJ48lW",
+        visitorID: [
+          ["newvisit1", 'Sat Nov 04 2023 01:17:00 GMT-0400 (Eastern Daylight Time)'],
+          ["newvisit2", 'Sat Nov 04 2023 02:30:00 GMT-0400 (Eastern Daylight Time)'],
+          ["newvisit2", 'Sat Nov 04 2023 12:30:00 GMT-0400 (Eastern Daylight Time)']
+        ],
+        totalVisits: 3,
+        uniqueVisits: 2
       }
     };
     assert.deepStrictEqual(userDatabaseCopy, expectedOutput);
@@ -97,14 +129,18 @@ describe('checkUrlId', function() {
 });
 
 
-describe('checkUrlIdExists', function() {
-  it('should return true if the URL ID exists in the entire database', function() {
-    const urlCheck = checkUrlIdExists("p2ap12", testUrlDatabase);
-    assert.isTrue(urlCheck);
+describe('getUniqueVisitorCount', function() {
+  it('should return 2 if there are two unique visitors in the log list', function() {
+    const visitorList = testUrlDatabase["b6UTxQ"].visitorID;
+    const visitorCount = getUniqueVisitorCount(visitorList);
+    const expectedCount = 2;
+    assert.strictEqual(visitorCount, expectedCount);
   });
-
-  it('should return false if the URL ID exists in the entire database', function() {
-    const urlCheck = checkUrlIdExists("test12", testUrlDatabase);
-    assert.isFalse(urlCheck);
+  
+  it('should return 2 if there are two unique visitors in the log list where one visitor is logged twice', function() {
+    const visitorList = testUrlDatabase["i3BoGr"].visitorID;
+    const visitorCount = getUniqueVisitorCount(visitorList);
+    const expectedCount = 2;
+    assert.strictEqual(visitorCount, expectedCount);
   });
 });
