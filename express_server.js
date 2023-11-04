@@ -5,7 +5,24 @@ const cookieSession = require("cookie-session");  // Express middleware that fac
 const bcrypt = require("bcryptjs");  // Store passwords securely
 
 // Import constants
-const { PORT, logInLink, registerLink, urlDatabase, users } = require("./constants");
+const {
+  PORT,
+  logInPrompt,
+  logInRegisterPrompt,
+  
+  urlDoesNotExistMsg,
+  doesNotOwnURLMsg,
+  unauthorizedDeleteMsg,
+  unauthorizedUpdateMsg,
+
+  emptyFieldsLoginMsg,
+  emptyFieldsRegisterMsg,
+  invalidEmailMsg,
+  invalidPasswordMsg,
+  emailExistsMsg,
+  
+  urlDatabase,
+  users } = require("./constants");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -59,7 +76,7 @@ app.get("/urls", (req, res) => {
     return res.render("urls_index", templateVars);
   }
   
-  return res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURLs list.\n`);
+  return res.status(403).send(`${logInPrompt}`);
 });
 
 
@@ -87,7 +104,7 @@ app.get("/urls/:id", (req, res) => {
   const urlID = req.params.id;
   // Check if urlID exists in the entire database
   if (!urlDatabase[urlID]) {
-    return res.status(404).send("This TinyURL does not exist.\n");
+    return res.status(404).send(`${urlDoesNotExistMsg}`);
   }
   
   const templateVars = {
@@ -99,12 +116,12 @@ app.get("/urls/:id", (req, res) => {
 
   // User is not logged in
   if (!users[userID]) {
-    return res.status(403).send(`Please ${logInLink} or ${registerLink} to view your TinyURL page.\n`);
+    return res.status(403).send(`${logInRegisterPrompt}`);
   }
 
   // When a logged in user tries to access the TinyURL info page which belongs to another user.
   if (!checkUrlId(urlID, userID, urlDatabase)) {
-    return res.status(403).send("Unauthorized request. You do not own this TinyURL.");
+    return res.status(403).send(`${doesNotOwnURLMsg}`);
   }
   
   // Happy path - Render TinyURL info page if the user is logged in and owns the TinyURL
@@ -119,7 +136,7 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[urlID].longURL;
     return res.redirect(longURL);
   }
-  return res.status(404).send("The TinyURL ID does not exist.\n");
+  return res.status(404).send(`${urlDoesNotExistMsg}`);
 });
 
 
@@ -165,7 +182,7 @@ app.post("/urls", (req, res) => {
 
   // Send error message to users that are not logged in
   if (!users[userID]) {
-    return res.status(403).send(`Please ${logInLink} or ${registerLink} to generate shortened URLs.\n`);
+    return res.status(403).send(`${unauthorizedUpdateMsg}`);
   }
   
   // Ensure that URLs are stored with the correct protocol
@@ -185,17 +202,17 @@ app.delete("/urls/:id/delete", (req, res) => {
   const urlID = req.params.id;
 
   if (!userID) {  // if the user is not logged in
-    return res.status(401).send(`Unauthorized request. Please ${logInLink} to delete your TinyURL.\n`);
+    return res.status(401).send(`${unauthorizedDeleteMsg}`);
   }
   
   // Check if urlID exists in the entire database
   if (!urlDatabase[urlID]) {
-    return res.status(404).send("This TinyURL does not exist.\n");
+    return res.status(404).send(`${urlDoesNotExistMsg}`);
   }
 
   // Check if the user has permission to delete the urlID
   if (!checkUrlId(urlID, userID, urlDatabase)) {
-    return res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+    return res.status(401).send(`${doesNotOwnURLMsg}`);
   }
   
   // Happy path - User is logged in, owns the url, and the urlID exists in the database
@@ -210,17 +227,17 @@ app.put("/urls/:id", (req, res) => {
   const urlID = req.params.id;
 
   if (!userID) {  // if the user is not logged in
-    return res.status(401).send(`Unauthorized request. Please ${logInLink} to view or modify your TinyURL.\n`);
+    return res.status(401).send(`${unauthorizedUpdateMsg}`);
   }
   
   // Check if urlID exists in the entire database
   if (!urlDatabase[urlID]) {
-    return res.status(404).send("This TinyURL does not exist.\n");
+    return res.status(404).send(`${urlDoesNotExistMsg}`);
   }
 
   // Check if the user has permission to modify the urlID
   if (!checkUrlId(urlID, userID, urlDatabase)) {
-    return res.status(401).send("Unauthorized request. This user does not own the TinyURL.\n");
+    return res.status(401).send(`${doesNotOwnURLMsg}`);
   }
   
   // Happy path - User is logged in, owns the url, and the urlID exists in the database
@@ -236,12 +253,12 @@ app.post("/login", (req, res) => {
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
-    return  res.status(400).send(`The Email and Password fields must not be empty. Try to ${logInLink} again.\n`);
+    return  res.status(400).send(`${emptyFieldsLoginMsg}`);
   }
 
   // Email is not found
   if (user === null) {
-    return res.status(404).send(`The user with this email address is not found. Please ${registerLink} to log in.\n`);
+    return res.status(404).send(`${invalidEmailMsg}`);
   }
   
   // Happy path - successful login
@@ -251,7 +268,7 @@ app.post("/login", (req, res) => {
   }
   
   // Email is found but password does not match
-  return res.status(400).send(`The password is incorrect. Please ${logInLink} and try again.\n`);
+  return res.status(400).send(`${invalidPasswordMsg}`);
 });
 
 
@@ -271,12 +288,12 @@ app.post("/register", (req, res) => {
 
   // Check if email or password are empty strings
   if (email === "" || password === "") {
-    return  res.status(400).send(`The Email and Password field must not be empty. Try to ${registerLink} again.\n`);
+    return  res.status(400).send(`${emptyFieldsRegisterMsg}`);
   }
 
   // Check if email already exists
   if (getUserByEmail(email, users) !== null) {
-    return res.status(400).send("An account with this email already exists.\n");
+    return res.status(400).send(`${emailExistsMsg}`);
   }
 
   users[id] = {
