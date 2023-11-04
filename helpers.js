@@ -71,6 +71,12 @@ const checkUrlId = function(urlID, userID, urlDatabase) {
  */
 const getUniqueVisitorCount = function(visitorList) {
   let uniqueList = [];
+
+  // To handle empty list for newly created accounts
+  if (visitorList.length === 0) {
+    return 0;
+  }
+
   for (let visit of visitorList) {
     const visitorID = visit[0];
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0

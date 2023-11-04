@@ -37,15 +37,12 @@ const testUrlDatabase = {
     totalVisits: 3,
     uniqueVisits: 2
   },
-  p2ap12: {
+  p2ap12: { // newly created account example
     longURL: "https://www.cbc.ca",
     userID: "z0s0as",
-    visitorID: [
-      ["visitor1", 'Sat Nov 04 2023 04:20:00 GMT-0400 (Eastern Daylight Time)'],
-      ["visitor2", 'Sat Nov 04 2023 04:30:00 GMT-0400 (Eastern Daylight Time)']
-    ],
-    totalVisits: 2,
-    uniqueVisits: 2
+    visitorID: [],
+    totalVisits: 0,
+    uniqueVisits: 0
   }
 };
 
@@ -130,17 +127,24 @@ describe('checkUrlId', function() {
 
 
 describe('getUniqueVisitorCount', function() {
-  it('should return 2 if there are two unique visitors in the log list', function() {
+  it('should return 2 if there are 2 unique visitors in the log list', function() {
     const visitorList = testUrlDatabase["b6UTxQ"].visitorID;
     const visitorCount = getUniqueVisitorCount(visitorList);
     const expectedCount = 2;
     assert.strictEqual(visitorCount, expectedCount);
   });
   
-  it('should return 2 if there are two unique visitors in the log list where one visitor is logged twice', function() {
+  it('should return 2 if there are 2 unique visitors in the log list where one visitor is logged twice', function() {
     const visitorList = testUrlDatabase["i3BoGr"].visitorID;
     const visitorCount = getUniqueVisitorCount(visitorList);
     const expectedCount = 2;
+    assert.strictEqual(visitorCount, expectedCount);
+  });
+  
+  it('should return 0 if the visitor list is empty', function() {
+    const visitorList = testUrlDatabase["p2ap12"].visitorID;
+    const visitorCount = getUniqueVisitorCount(visitorList);
+    const expectedCount = 0;
     assert.strictEqual(visitorCount, expectedCount);
   });
 });
