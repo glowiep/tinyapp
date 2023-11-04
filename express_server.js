@@ -136,16 +136,16 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
+  const urlIDObject = urlDatabase[urlID];
 
   // Check if urlID exists
-  if (!urlDatabase[urlID]) {
+  if (!urlIDObject) {
     return res.status(404).send(`${urlDoesNotExistMsg}`);
   }
 
   const longURL = urlDatabase[urlID].longURL;
   const newVisitorID = generateRandomString();
   const currentTime = new Date().toString();
-  const urlIDObject = urlDatabase[urlID];
 
   if (!req.session.isNew && req.session.visitorID) {
     urlIDObject.totalVisits += 1;
