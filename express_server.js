@@ -140,6 +140,11 @@ app.get("/u/:id", (req, res) => {
   const currentTime = new Date().toString();
 
   if (urlDatabase[urlID]) { // Work in progress - need to add unique users count
+    if (!req.session.isNew) {
+      urlDatabase[urlID].totalVisits += 1;
+      urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
+      return res.redirect(longURL);
+    }
     req.session.visitorID = newVisitorID;
     urlDatabase[urlID].totalVisits += 1;
     urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
