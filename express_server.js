@@ -135,22 +135,27 @@ app.get("/urls/:id", (req, res) => {
 // Redirect to longURL. User does not need to be logged in.
 app.get("/u/:id", (req, res) => {
   const urlID = req.params.id;
+
+  // Check if urlID exists
+  if (!urlDatabase[urlID]) {
+    return res.status(404).send(`${urlDoesNotExistMsg}`);
+  }
+
   const longURL = urlDatabase[urlID].longURL;
   const newVisitorID = generateRandomString();
   const currentTime = new Date().toString();
 
-  if (urlDatabase[urlID]) { // Work in progress - need to add unique users count
-    if (!req.session.isNew) {
-      urlDatabase[urlID].totalVisits += 1;
-      urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
-      return res.redirect(longURL);
-    }
-    req.session.visitorID = newVisitorID;
+  if (!req.session.isNew && req.session.visitorID) {  // Work in progress - need to add unique users count
     urlDatabase[urlID].totalVisits += 1;
     urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
     return res.redirect(longURL);
   }
-  return res.status(404).send(`${urlDoesNotExistMsg}`);
+
+  // Happy path - new unique visitor
+  req.session.visitorID = newVisitorID;
+  urlDatabase[urlID].totalVisits += 1;
+  urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
+  return res.redirect(longURL);
 });
 
 
