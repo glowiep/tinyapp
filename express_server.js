@@ -39,7 +39,8 @@ const {
   generateRandomString,
   getUserByEmail,
   urlsForUser,
-  checkUrlId } = require("./helpers");
+  checkUrlId,
+  getUniqueVisitorCount } = require("./helpers");
 
 app.get("/", (req, res) => {
   const userID = req.session.user_id;
@@ -148,6 +149,7 @@ app.get("/u/:id", (req, res) => {
   if (!req.session.isNew && req.session.visitorID) {  // Work in progress - need to add unique users count
     urlDatabase[urlID].totalVisits += 1;
     urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
+    urlDatabase[urlID].uniqueVisits = getUniqueVisitorCount(urlDatabase[urlID].visitorID);
     return res.redirect(longURL);
   }
 
@@ -155,6 +157,7 @@ app.get("/u/:id", (req, res) => {
   req.session.visitorID = newVisitorID;
   urlDatabase[urlID].totalVisits += 1;
   urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
+  urlDatabase[urlID].uniqueVisits = getUniqueVisitorCount(urlDatabase[urlID].totalVisits);
   return res.redirect(longURL);
 });
 
