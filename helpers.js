@@ -80,9 +80,9 @@ const getUniqueVisitorCount = function(visitorList) {
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
       uniqueList.push(visitorID);
     }
-    count = uniqueList.length;
-    return count;
   }
+  count = uniqueList.length;
+  return count;
 };
 
 module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, getUniqueVisitorCount };
