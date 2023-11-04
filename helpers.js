@@ -77,12 +77,22 @@ const getUniqueVisitorCount = function(visitorList) {
     return count;
   }
 
-  for (let visit in visitorList) {
+  // This is a unique visitor count bug fix to handle case for first time visit to the newly created URL in a new account
+  if (visitorList.length === 1) {
+    const visitorID = visitorList[0][0];
+    uniqueList.push(visitorID);
+    return uniqueList.length;
+  }
+
+  for (let visit of visitorList) {
     const visitorID = visit[0];
     if (!uniqueList.includes(visitorID)) {  // The visitor ID is on index 0
       uniqueList.push(visitorID);
+    } else {
+      continue;
     }
   }
+
   count = uniqueList.length;
   return count;
 };
