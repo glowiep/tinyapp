@@ -64,18 +64,4 @@ const checkUrlId = function(urlID, userID, urlDatabase) {
 };
 
 
-/**
- * Check if the TinyURL exists in the entire database
- * 
- * @param {string} urlID - TinyURL identifier
- * @param {object} urlDatabase  - user database object
- * @returns {boolean} Returns true if the urlID exists in the entire database.
- */
-const checkUrlIdExists = function(urlID, urlDatabase) {
-  if (Object.keys(urlDatabase).includes(urlID)) {
-    return true;
-  }
-  return false;
-};
-
-module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId, checkUrlIdExists };
+module.exports = { generateRandomString, getUserByEmail, urlsForUser, checkUrlId };
