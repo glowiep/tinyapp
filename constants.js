@@ -23,14 +23,23 @@ const emailExistsMsg = `An account with this email already exists.\n`;
 
 // The urlDatabase contain multiple 'urlID' objects, which contains the long url and the userID (used to set session cookie)
 const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
+    visitorID: [
+      ["newvisitor1", 'Sat Nov 04 2023 01:17:07 GMT-0400 (Eastern Daylight Time)'],
+      ["newvisitor2", 'Sat Nov 04 2023 01:30:00 GMT-0400 (Eastern Daylight Time)']
+    ],
+    totalVisits: 2,
+    uniqueVisits: 2
   },
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+    visitorID: [],
+    totalVisits: 0,
+    uniqueVisits: 0,
+  }
 };
 
 // To store and access users
