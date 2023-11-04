@@ -222,6 +222,7 @@ app.post("/urls", (req, res) => {
       totalVisits: 0,
       uniqueVisits: 0
     };
+    return res.redirect(`/urls/${randomString}`);
   }
 
   // Happy path - Save TinyURL to database and redirect to /urls/:id page
