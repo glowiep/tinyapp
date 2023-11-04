@@ -145,19 +145,20 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[urlID].longURL;
   const newVisitorID = generateRandomString();
   const currentTime = new Date().toString();
+  const urlIDObject = urlDatabase[urlID];
 
   if (!req.session.isNew && req.session.visitorID) {
-    urlDatabase[urlID].totalVisits += 1;
-    urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
-    urlDatabase[urlID].uniqueVisits = getUniqueVisitorCount(urlDatabase[urlID].visitorID);
+    urlIDObject.totalVisits += 1;
+    urlIDObject.visitorID.push([req.session.visitorID, currentTime]);
+    urlIDObject.uniqueVisits = getUniqueVisitorCount(urlIDObject.visitorID);
     return res.redirect(longURL);
   }
 
   // Happy path - new unique visitor
   req.session.visitorID = newVisitorID;
-  urlDatabase[urlID].totalVisits += 1;
-  urlDatabase[urlID].visitorID.push([req.session.visitorID, currentTime]);
-  urlDatabase[urlID].uniqueVisits = getUniqueVisitorCount(urlDatabase[urlID].totalVisits);
+  urlIDObject.totalVisits += 1;
+  urlIDObject.visitorID.push([req.session.visitorID, currentTime]);
+  urlIDObject.uniqueVisits = getUniqueVisitorCount(urlIDObject.totalVisits);
   return res.redirect(longURL);
 });
 
