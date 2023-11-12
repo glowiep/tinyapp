@@ -8,15 +8,14 @@ const bcrypt = require("bcryptjs");  // Store passwords securely
 const {
   PORT,
   urlDoesNotExistMsg,
-  
   emptyFieldsLoginMsg,
   emptyFieldsRegisterMsg,
   invalidEmailMsg,
   invalidPasswordMsg,
-  emailExistsMsg,
-  
-  urlDatabase,
-  users } = require("./constants");
+  emailExistsMsg } = require("./constants");
+
+// Import databases
+const { urlDatabase, users } = require("./databases")
   
 // Import helper functions
 const {

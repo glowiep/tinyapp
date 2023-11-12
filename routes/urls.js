@@ -5,14 +5,13 @@ const router = express.Router();
 const {
   logInPrompt,
   logInRegisterPrompt,
-  
   urlDoesNotExistMsg,
   doesNotOwnURLMsg,
   unauthorizedDeleteMsg,
-  unauthorizedUpdateMsg,
+  unauthorizedUpdateMsg } = require("../constants");
 
-  urlDatabase,
-  users } = require("../constants");
+// Import databases
+const { urlDatabase, users } = require("../databases");
 
 // Import helper functions
 const {
